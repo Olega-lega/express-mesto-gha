@@ -20,7 +20,7 @@ const createCard = async (req, res) => {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(400).json({ message: `При создании карточки переданы некорректные данные. ${errors.join(', ')}` });
+      return res.status(400).json({ message: `При создании карточки, переданы некорректные данные. ${errors.join(', ')}` });
     }
     return res.status(500).json({ message: 'Произошла ошибка' });
   }
@@ -59,7 +59,7 @@ const likeCard = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: 'Переданы некорректные данные для постановки лайка.' });
+      return res.status(400).json({ message: 'Введены некорректные данные для постановки лайка.' });
     }
     return res.status(500).json({ message: 'Произошла ошибка' });
   }
@@ -80,7 +80,7 @@ const dislikeCard = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: 'Некорректные данные для снятия лайка.' });
+      return res.status(400).json({ message: 'Введенны некорректны данные для снятия лайка.' });
     }
     return res.status(500).json({ message: 'Произошла ошибка' });
   }
