@@ -34,7 +34,6 @@ const deleteCard = async (req, res) => {
     if (!query) {
       return res.status(404).json({ message: 'Карточка c указанным id не найдена' });
     }
-
     return res.json({ message: 'Карточка удалена' });
   } catch (err) {
     console.error(err);
@@ -53,7 +52,6 @@ const likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
-
     if (!query) {
       return res.status(404).json({ message: 'Карточка c указанным id не найдена' });
     }
