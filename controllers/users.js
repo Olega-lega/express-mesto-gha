@@ -37,13 +37,13 @@ const getUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: 'Передан некорректный id пользователя.' });
+      return res.status(400).json({ message: 'Некорректный id пользователя.' });
     }
     return res.status(500).json({ message: 'Произошла ошибка' });
   }
 };
 
-const updateUserProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const id = req.user._id;
     const user = await User.findByIdAndUpdate(id, { name: req.body.name, about: req.body.about }, {
@@ -66,7 +66,7 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-const updateUserAvatar = async (req, res) => {
+const updateAvatar = async (req, res) => {
   try {
     const id = req.user._id;
     const user = await User.findByIdAndUpdate(id, { avatar: req.body.avatar }, { new: true });
@@ -87,5 +87,5 @@ const updateUserAvatar = async (req, res) => {
 };
 
 module.exports = {
-  getUsers, createUser, getUser, updateUserProfile, updateUserAvatar,
+  getUsers, createUser, getUser, updateProfile, updateAvatar,
 };
