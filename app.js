@@ -9,15 +9,7 @@ const PORT = 3000;
 const app = express();
 
 app.use(bodyParser.json());
-
 app.use(helmet());
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6384601d3321b92c4ebc820e',
-  };
-  next();
-});
 
 app.use((req, res, next) => {
   req.user = {

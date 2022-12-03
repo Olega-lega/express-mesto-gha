@@ -59,7 +59,7 @@ const likeCard = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: 'Переданы некорректные данные для постановки лайка.' });
+      return res.status(400).json({ message: 'Ввод некорретных данные для постановки лайка.' });
     }
     return res.status(500).json({ message: 'Произошла ошибка' });
   }
@@ -80,7 +80,7 @@ const dislikeCard = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: 'Некорректные данные для снятия лайка.' });
+      return res.status(400).json({ message: 'Введены данные для снятия лайка.' });
     }
     return res.status(500).json({ message: 'Произошла ошибка' });
   }
