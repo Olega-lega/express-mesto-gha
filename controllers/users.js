@@ -49,7 +49,7 @@ const getUser = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+const updateUserProfile = async (req, res) => {
   try {
     const id = req.user._id;
     const user = await User.findByIdAndUpdate(
@@ -76,7 +76,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-const updateAvatar = async (req, res) => {
+const updateUserAvatar = async (req, res) => {
   try {
     const id = req.user._id;
     const user = await User.findByIdAndUpdate(
@@ -107,6 +107,6 @@ module.exports = {
   getUsers,
   createUser,
   getUser,
-  updateProfile,
-  updateAvatar,
+  updateUserProfile,
+  updateUserAvatar,
 };
