@@ -18,14 +18,14 @@ const createCard = async (req, res) => {
     const newCard = await Card.create({
       name: req.body.name,
       link: req.body.link,
-      owner: req.user,
+      owner: req.user._id,
     });
     return res.status(httpStatusCodes.created).json(newCard);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(400).json({ message: `При создании карточки, переданы некорректные данные. ${errors.join(', ')}` });
+      return res.status(httpStatusCodes.badRequest).json({ message: `При создании карточки, переданы некорректные данные. ${errors.join(', ')}` });
     }
     return res
       .status(httpStatusCodes.serverError)
