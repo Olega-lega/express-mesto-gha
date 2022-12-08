@@ -8,7 +8,7 @@ const {
 
 const getCards = async (req, res) => {
   try {
-    const cards = await Card.find({});
+    const cards = await Card.find({}.populate(['owner', 'likes']));
     cards.populate(['owner', 'likes']);
     return res.json(cards);
   } catch (err) {

@@ -1,5 +1,10 @@
 const User = require('../models/user');
-const { httpStatusCodes } = require('../utils/constants');
+const {
+  created,
+  badRequest,
+  notFound,
+  serverError,
+} = require('../utils/constants');
 
 const getUsers = async (req, res) => {
   try {
@@ -8,7 +13,7 @@ const getUsers = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res
-      .status(httpStatusCodes.serverError)
+      .status(serverError)
       .json({ message: 'Произошла ошибка' });
   }
 };
@@ -20,19 +25,19 @@ const createUser = async (req, res) => {
       about: req.body.about,
       avatar: req.body.avatar,
     });
-    return res.status(httpStatusCodes.created).json(user);
+    return res.status(created).json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(httpStatusCodes.badRequest).json({
+      return res.status(badRequest).json({
         message: `Введены некорректные данные при создании пользователя. ${errors.join(
           ', ',
         )}`,
       });
     }
     return res
-      .status(httpStatusCodes.serverError)
+      .status(serverError)
       .json({ message: 'Произошла ошибка' });
   }
 };
@@ -43,7 +48,7 @@ const getUser = async (req, res) => {
     const user = await User.findById(id);
     if (!user) {
       return res
-        .status(httpStatusCodes.notFound)
+        .status(notFound)
         .json({ message: 'Пользователь не найден' });
     }
     return res.json(user);
@@ -51,11 +56,11 @@ const getUser = async (req, res) => {
     console.error(err);
     if (err.name === 'CastError') {
       return res
-        .status(httpStatusCodes.badRequest)
+        .status(badRequest)
         .json({ message: 'Введен некорректный id пользователя.' });
     }
     return res
-      .status(httpStatusCodes.serverError)
+      .status(serverError)
       .json({ message: 'Произошла ошибка' });
   }
 };
@@ -73,7 +78,7 @@ const updateProfile = async (req, res) => {
     );
     if (!user) {
       return res
-        .status(httpStatusCodes.notFound)
+        .status(notFound)
         .json({ message: 'Пользователь не найден' });
     }
     return res.json(user);
@@ -81,14 +86,14 @@ const updateProfile = async (req, res) => {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(httpStatusCodes.badRequest).json({
+      return res.status(badRequest).json({
         message: `Введен некорректные данные при обновлении профиля. ${errors.join(
           ', ',
         )}`,
       });
     }
     return res
-      .status(httpStatusCodes.serverError)
+      .status(serverError)
       .json({ message: 'Произошла ошибка' });
   }
 };
@@ -106,7 +111,7 @@ const updateAvatar = async (req, res) => {
     );
     if (!user) {
       return res
-        .status(httpStatusCodes.notFound)
+        .status(notFound)
         .json({ message: 'Пользователь не найден' });
     }
     return res.json(user);
@@ -114,14 +119,14 @@ const updateAvatar = async (req, res) => {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(httpStatusCodes.badRequest).json({
+      return res.status(badRequest).json({
         message: `Введены некорректные данные при обновлении аватара. ${errors.join(
           ', ',
         )}`,
       });
     }
     return res
-      .status(httpStatusCodes.serverError)
+      .status(serverError)
       .json({ message: 'Произошла ошибка' });
   }
 };
