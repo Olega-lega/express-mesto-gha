@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
@@ -9,7 +8,7 @@ const { httpStatusCodes } = require('./utils/constants');
 const PORT = 3000;
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use(helmet());
 
