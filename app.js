@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const { httpStatusCodes } = require('./utils/constants');
+const { notFound } = require('./utils/constants');
 
 const PORT = 3000;
 const app = express();
@@ -25,13 +25,12 @@ app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
 app.use('*', (req, res) => res
-  .status(httpStatusCodes.notFound)
+  .status(notFound)
   .json({ message: 'Ошибка: запрос не существует' }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 }, () => {
-  console.log('Connected to MongoDB');
   app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
   });

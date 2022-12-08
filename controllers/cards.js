@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const {
+  success,
   created,
   badRequest,
   notFound,
@@ -8,8 +9,7 @@ const {
 
 const getCards = async (req, res) => {
   try {
-    const cards = await Card.find({}.populate(['owner', 'likes']));
-    cards.populate(['owner', 'likes']);
+    const cards = await Card.find({}).populate(['owner', 'likes']);
     return res.json(cards);
   } catch (err) {
     console.error(err);
@@ -64,13 +64,12 @@ const likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
-    query.populate(['likes']);
     if (!query) {
       return res
         .status(notFound)
         .json({ message: 'Карточка c указанным id не найдена' });
     }
-    return res.json({ message: 'Лайк добавлен' });
+    return res.status(created).json(query);
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
@@ -90,13 +89,12 @@ const dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     );
-    query.populate(['likes']);
     if (!query) {
       return res
         .status(notFound)
         .json({ message: 'Карточка c указанным id не найдена' });
     }
-    return res.json({ message: 'Лайк удален' });
+    return res.status(success).json(query);
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
