@@ -27,7 +27,7 @@ const createUser = async (req, res) => {
       const errors = Object.values(err.errors).map((error) => error.message);
       return res.status(httpStatusCodes.badRequest).json({
         message: `Введены некорректные данные при создании пользователя. ${errors.join(
-          ', '
+          ', ',
         )}`,
       });
     }
@@ -69,7 +69,7 @@ const updateProfile = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     );
     if (!user) {
       return res
@@ -83,7 +83,7 @@ const updateProfile = async (req, res) => {
       const errors = Object.values(err.errors).map((error) => error.message);
       return res.status(httpStatusCodes.badRequest).json({
         message: `Введен некорректные данные при обновлении профиля. ${errors.join(
-          ', '
+          ', ',
         )}`,
       });
     }
@@ -102,7 +102,7 @@ const updateAvatar = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     );
     if (!user) {
       return res
@@ -116,7 +116,7 @@ const updateAvatar = async (req, res) => {
       const errors = Object.values(err.errors).map((error) => error.message);
       return res.status(httpStatusCodes.badRequest).json({
         message: `Введены некорректные данные при обновлении аватара. ${errors.join(
-          ', '
+          ', ',
         )}`,
       });
     }

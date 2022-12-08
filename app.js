@@ -24,11 +24,9 @@ app.use('/users', usersRouter);
 
 app.use('/cards', cardsRouter);
 
-app.use('*', (req, res) =>
-res
-    .status(httpStatusCodes.notFound)
-    .json({ message: 'Ошибка: запрос не существует' }),
-);
+app.use('*', (req, res) => res
+  .status(httpStatusCodes.notFound)
+  .json({ message: 'Ошибка: запрос не существует' }));
 
 mongoose.connect(
   'mongodb://localhost:27017/mestodb',
@@ -39,5 +37,5 @@ mongoose.connect(
     app.listen(PORT, () => {
       console.log(`app listening on port ${PORT}!`);
     });
-  }
+  },
 );
