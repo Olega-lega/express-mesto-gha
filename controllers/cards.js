@@ -25,11 +25,7 @@ const createCard = async (req, res) => {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(httpStatusCodes.notFound).json({
-        message: `При создании карточки, переданы некорректные данные. ${errors.join(
-          ', '
-        )}`,
-      });
+      return res.status(400).json({ message: `При создании карточки, переданы некорректные данные. ${errors.join(', ')}` });
     }
     return res
       .status(httpStatusCodes.serverError)
@@ -41,23 +37,16 @@ const deleteCard = async (req, res) => {
   try {
     const { id } = req.params;
     const query = await Card.findByIdAndRemove(id);
-
     if (!query) {
-      return res
-        .status(httpStatusCodes.notFound)
-        .json({ message: 'Карточка c указанным id не найдена' });
+      return res.status(httpStatusCodes.notFound).json({ message: 'Карточка c указанным id не найдена' });
     }
     return res.json({ message: 'Карточка удалена' });
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res
-        .status(httpStatusCodes.notFound)
-        .json({ message: 'Некорректный id карточки.' });
+      return res.status(httpStatusCodes.badRequest).json({ message: 'Передан некорректный id карточки.' });
     }
-    return res
-      .status(httpStatusCodes.serverError)
-      .json({ message: 'Произошла ошибка' });
+    return res.status(httpStatusCodes.serverError).json({ message: 'Произошла ошибка' });
   }
 };
 
@@ -67,7 +56,7 @@ const likeCard = async (req, res) => {
     const query = await Card.findByIdAndUpdate(
       id,
       { $addToSet: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     );
     if (!query) {
       return res
@@ -78,9 +67,7 @@ const likeCard = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res
-        .status(httpStatusCodes.notFound)
-        .json({ message: 'Введены некорректные данные для постановки лайка.' });
+      return res.status(httpStatusCodes.badRequest).json({ message: 'Введены некорректные данные для постановки лайка.' });
     }
     return res
       .status(httpStatusCodes.serverError)
@@ -94,7 +81,7 @@ const dislikeCard = async (req, res) => {
     const query = await Card.findByIdAndUpdate(
       id,
       { $pull: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     );
     if (!query) {
       return res
@@ -105,9 +92,7 @@ const dislikeCard = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res
-        .status(httpStatusCodes.notFound)
-        .json({ message: 'Введенны некорректны данные для снятия лайка.' });
+      return res.status(httpStatusCodes.badRequest).json({ message: 'Введенны некорректны данные для снятия лайка.' });
     }
     return res
       .status(httpStatusCodes.serverError)
