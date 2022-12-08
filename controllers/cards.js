@@ -4,6 +4,7 @@ const { httpStatusCodes } = require('../utils/constants');
 const getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
+    cards.populate(['owner', 'likes']);
     return res.json(cards);
   } catch (err) {
     console.error(err);
