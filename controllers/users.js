@@ -91,6 +91,10 @@ const updateProfile = async (req, res) => {
           ', ',
         )}`,
       });
+    } if (err.name === 'CastError') {
+      return res
+        .status(badRequest)
+        .json({ message: 'Введен некорректный id пользователя.' });
     }
     return res
       .status(serverError)
@@ -124,6 +128,10 @@ const updateAvatar = async (req, res) => {
           ', ',
         )}`,
       });
+    } if (err.name === 'CastError') {
+      return res
+        .status(badRequest)
+        .json({ message: 'Введен некорректный id пользователя.' });
     }
     return res
       .status(serverError)
