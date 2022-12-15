@@ -1,71 +1,66 @@
-const User = require('../models/user');
-const {
-  created,
-  badRequest,
-  notFound,
-  serverError,
-} = require('../utils/constants');
+const bcrypt = require('bcryptjs');
+// const jwt = require('jsonwebtoken');
 
-const getUsers = async (req, res) => {
+const User = require('../models/user');
+const ConflictError = require('../errors/ConflictError');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+
+const { created } = require('../utils/constants');
+
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     return res.json(users);
   } catch (err) {
     console.error(err);
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    return next(err);
   }
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
+    const hash = await bcrypt.hash(req.body.password, 10);
     const user = await User.create({
       name: req.body.name,
       about: req.body.about,
       avatar: req.body.avatar,
+      password: hash,
     });
     return res.status(created).json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(badRequest).json({
-        message: `Введены некорректные данные при создании пользователя. ${errors.join(
-          ', ',
-        )}`,
-      });
+      next(new BadRequestError(`Введены некорректные данные при создании пользователя. ${errors.join(
+        ', ',
+      )}`));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    if (err.code === 11000) {
+      next(new ConflictError('Пользователь с указанным email уже зарегестрирован!'));
+    }
+    next(err);
   }
 };
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
-      return res
-        .status(notFound)
-        .json({ message: 'Пользователь не найден' });
+      return next(new NotFoundError('Пользователь не найден'));
     }
     return res.json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res
-        .status(badRequest)
-        .json({ message: 'Введен некорректный id пользователя.' });
+      next(new BadRequestError('Введен некорректный id пользователя.'));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res, next) => {
   try {
     const id = req.user._id;
     const user = await User.findByIdAndUpdate(
@@ -77,32 +72,24 @@ const updateProfile = async (req, res) => {
       },
     );
     if (!user) {
-      return res
-        .status(notFound)
-        .json({ message: 'Пользователь не найден' });
+      next(new NotFoundError('Пользователь не найден!'));
     }
     return res.json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(badRequest).json({
-        message: `Введен некорректные данные при обновлении профиля. ${errors.join(
-          ', ',
-        )}`,
-      });
+      next(new BadRequestError(`Введен некорректные данные при обновлении профиля. ${errors.join(
+        ', ',
+      )}`));
     } if (err.name === 'CastError') {
-      return res
-        .status(badRequest)
-        .json({ message: 'Введен некорректный id пользователя.' });
+      next(new BadRequestError('Введен некорректный id пользователя.'));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
-const updateAvatar = async (req, res) => {
+const updateAvatar = async (req, res, next) => {
   try {
     const id = req.user._id;
     const user = await User.findByIdAndUpdate(
@@ -114,28 +101,18 @@ const updateAvatar = async (req, res) => {
       },
     );
     if (!user) {
-      return res
-        .status(notFound)
-        .json({ message: 'Пользователь не найден' });
+      next(new NotFoundError('Пользователь не найден!'));
     }
     return res.json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(badRequest).json({
-        message: `Введены некорректные данные при обновлении аватара. ${errors.join(
-          ', ',
-        )}`,
-      });
+      next(new BadRequestError(`Введены некорректные данные при обновлении аватара. ${errors.join(', ')}`));
     } if (err.name === 'CastError') {
-      return res
-        .status(badRequest)
-        .json({ message: 'Введен некорректный id пользователя.' });
+      next(new BadRequestError('Введен некорректный id пользователя.'));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 

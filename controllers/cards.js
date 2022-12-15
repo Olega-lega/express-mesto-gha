@@ -1,25 +1,22 @@
 const Card = require('../models/card');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 const {
   success,
   created,
-  badRequest,
-  notFound,
-  serverError,
 } = require('../utils/constants');
 
-const getCards = async (req, res) => {
+const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({}).populate(['owner', 'likes']);
     return res.json(cards);
   } catch (err) {
     console.error(err);
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   try {
     const newCard = await Card.create({
       name: req.body.name,
@@ -31,32 +28,34 @@ const createCard = async (req, res) => {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return res.status(badRequest).json({ message: `При создании карточки, переданы некорректные данные. ${errors.join(', ')}` });
+      next(new BadRequestError(`При создании карточки, переданы некорректные данные. ${errors.join(', ')}`));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
-const deleteCard = async (req, res) => {
+const deleteCard = async (req, res, next) => {
   try {
     const { id } = req.params;
     const query = await Card.findByIdAndRemove(id);
     if (!query) {
-      return res.status(notFound).json({ message: 'Карточка c указанным id не найдена' });
+      next(new NotFoundError('Карточка c указанным id не найдена!'));
     }
-    return res.json({ message: 'Карточка удалена' });
+    if (JSON.stringify(query.owner) !== JSON.stringify(req.user._id)) {
+      await Card.findByIdAndRemove(id);
+      return res.status(success).json({ message: 'Карточка удалена' });
+    }
+    next(new BadRequestError('Недостаточно прав для удаления указанной карточки.'));
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(badRequest).json({ message: 'Передан некорректный id карточки.' });
+      next(new BadRequestError('Передан некорректный id карточки!'));
     }
-    return res.status(serverError).json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   try {
     const { id } = req.params;
     const query = await Card.findByIdAndUpdate(
@@ -65,23 +64,19 @@ const likeCard = async (req, res) => {
       { new: true },
     );
     if (!query) {
-      return res
-        .status(notFound)
-        .json({ message: 'Карточка c указанным id не найдена' });
+      return next(new NotFoundError('Карточка c указанным id не найдена!'));
     }
     return res.status(created).json(query);
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(badRequest).json({ message: 'Введены некорректные данные для постановки лайка.' });
+      next(new BadRequestError('Введены некорректные данные для постановки лайка.'));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   try {
     const { id } = req.params;
     const query = await Card.findByIdAndUpdate(
@@ -90,19 +85,15 @@ const dislikeCard = async (req, res) => {
       { new: true },
     );
     if (!query) {
-      return res
-        .status(notFound)
-        .json({ message: 'Карточка c указанным id не найдена' });
+      return next(new NotFoundError('Карточка c указанным id не найдена!'));
     }
     return res.status(success).json(query);
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      return res.status(badRequest).json({ message: 'Введенны некорректны данные для снятия лайка.' });
+      next(new BadRequestError('Введены некорректные данные для снятия лайка!'));
     }
-    return res
-      .status(serverError)
-      .json({ message: 'Произошла ошибка' });
+    next(err);
   }
 };
 
