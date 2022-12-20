@@ -140,6 +140,22 @@ const login = async (req, res, next) => {
   }
 };
 
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const id = req.user._id;
+    const user = await User.findById(id);
+    if (!user) {
+      return next(new NotFoundError('Пользователь не найден!'));
+    }
+    return res.json(user);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Введен некорректный id пользователя.'));
+    }
+    return next(err);
+  }
+};
+
 module.exports = {
   getUsers,
   createUser,
@@ -147,4 +163,5 @@ module.exports = {
   updateProfile,
   updateAvatar,
   login,
+  getCurrentUser,
 };
