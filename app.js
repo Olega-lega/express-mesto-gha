@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
-const { notFound } = require('./utils/constants');
+const { errors } = require('celebrate');
+const routes = require('./routes');
+const errorsHandler = require('./middlewares/middlewares');
 
 const PORT = 3000;
 const app = express();
@@ -13,20 +13,11 @@ app.use(bodyParser.json());
 
 app.use(helmet());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6384601d3321b92c4ebc820e',
-  };
-  next();
-});
+app.use(routes);
 
-app.use('/users', usersRouter);
+app.use(errorsHandler);
 
-app.use('/cards', cardsRouter);
-
-app.use('*', (req, res) => res
-  .status(notFound)
-  .json({ message: 'Ошибка: запрос не существует' }));
+app.use(errors());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
