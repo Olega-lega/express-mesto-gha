@@ -12,7 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator(e) {
-        return urlRegExp(e);
+        return urlRegExp.test(e);
       },
       message: (props) => `${props.value} is not a valid url!`,
     },
@@ -34,6 +34,6 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-const card = mongoose.model('card', cardSchema);
+const user = mongoose.model('user', cardSchema);
 
-module.exports = card;
+module.exports = user;

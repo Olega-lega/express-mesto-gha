@@ -1,17 +1,22 @@
-const created = 201;
-const badRequest = 400;
-const notFound = 404;
-const serverError = 500;
+const CODE_STATUS_OK = 200;
+const CODE_STATUS_CREATED = 201;
+const BAD_REQUEST_MESSAGE = 400;
+const UNAUTHORIZED_MESSAGE = 401;
+const FORBIDEN_ERROR_MESSAGE = 403;
+const NOT_FOUND__MESSAGE = 404;
+const CONFLICT_MESSAGE = 409;
+const SERVER_ERROR_MESSAGE = 500;
 
-const urlRegExp = (value) => {
-  // eslint-disable-next-line no-useless-escape
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&\/\/=]*)/gm.test(value);
-};
+const urlRegExp = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
 
 module.exports = {
-  created,
-  badRequest,
-  notFound,
-  serverError,
+  CODE_STATUS_OK,
+  CODE_STATUS_CREATED,
+  BAD_REQUEST_MESSAGE,
+  UNAUTHORIZED_MESSAGE,
+  FORBIDEN_ERROR_MESSAGE,
+  NOT_FOUND__MESSAGE,
+  SERVER_ERROR_MESSAGE,
+  CONFLICT_MESSAGE,
   urlRegExp,
 };

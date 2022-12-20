@@ -7,7 +7,7 @@ const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
-const { created } = require('../utils/constants');
+const { CODE_STATUS_CREATED } = require('../utils/constants');
 
 const getUsers = async (req, res, next) => {
   try {
@@ -27,7 +27,7 @@ const createUser = async (req, res, next) => {
       avatar: req.body.avatar,
       password: hash,
     });
-    return res.status(created).json({
+    return res.status(CODE_STATUS_CREATED).json({
       name: user.name,
       about: user.about,
       avatar: user.avatar,
@@ -37,12 +37,18 @@ const createUser = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      next(new BadRequestError(`Введены некорректные данные при создании пользователя. ${errors.join(
-        ', ',
-      )}`));
+      return next(
+        new BadRequestError(
+          `Введены некорректные данные при создании пользователя. ${errors.join(
+            ', ',
+          )}`,
+        ),
+      );
     }
     if (err.code === 11000) {
-      next(new ConflictError('Пользователь с указанным email уже зарегестрирован!'));
+      return next(
+        new ConflictError('Пользователь с указанным email уже зарегестрирован!'),
+      );
     }
     return next(err);
   }
@@ -58,7 +64,7 @@ const getUser = async (req, res, next) => {
     return res.json(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      next(new BadRequestError('Введен некорректный id пользователя.'));
+      return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
     return next(err);
   }
@@ -76,15 +82,19 @@ const updateProfile = async (req, res, next) => {
       },
     );
     if (!user) {
-      next(new NotFoundError('Пользователь не найден!'));
+      return next(new NotFoundError('Пользователь не найден!'));
     }
     return res.json(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      next(new BadRequestError(`Введен некорректные данные при обновлении профиля. ${errors.join(
-        ', ',
-      )}`));
+      return next(
+        new BadRequestError(
+          `Введен некорректные данные при обновлении профиля. ${errors.join(
+            ', ',
+          )}`,
+        ),
+      );
     }
     return next(err);
   }
@@ -102,14 +112,20 @@ const updateAvatar = async (req, res, next) => {
       },
     );
     if (!user) {
-      next(new NotFoundError('Пользователь не найден!'));
+      return next(new NotFoundError('Пользователь не найден!'));
     }
     return res.json(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
 
-      return next(new BadRequestError(`Введены некорректные данные при обновлении аватара. ${errors.join(', ')}`));
+      return next(
+        new BadRequestError(
+          `Введены некорректные данные при обновлении аватара. ${errors.join(
+            ', ',
+          )}`,
+        ),
+      );
     }
     return next(err);
   }
@@ -121,16 +137,22 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      return next(new UnauthorizedError('Ошибка в процессе аутентификации пользователя.'));
+      return next(
+        new UnauthorizedError('Ошибка в процессе аутентификации пользователя.'),
+      );
     }
 
     const matched = await bcrypt.compare(password, user.password);
 
     if (!matched) {
-      throw new UnauthorizedError('Ошибка в процессе аутентификации пользователя.');
+      throw new UnauthorizedError(
+        'Ошибка в процессе аутентификации пользователя.',
+      );
     }
 
-    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+    const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+      expiresIn: '7d',
+    });
 
     return res.json({ token });
   } catch (err) {
@@ -147,9 +169,6 @@ const getCurrentUser = async (req, res, next) => {
     }
     return res.json(user);
   } catch (err) {
-    if (err.name === 'CastError') {
-      return next(new BadRequestError('Введен некорректный id пользователя.'));
-    }
     return next(err);
   }
 };

@@ -1,13 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const { urlRegExp } = require('./constants');
 
-const validateCurrentUser = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-  }),
-});
-
 const validateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -17,7 +10,7 @@ const validateUser = celebrate({
 
 const validateUserId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().alphanum().hex().length(24),
+    id: Joi.string().required().hex().length(24),
   }),
 });
 
@@ -36,7 +29,7 @@ const validateNewCard = celebrate({
 
 const validateCardId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().alphanum().hex().length(24),
+    id: Joi.string().required().hex().length(24),
   }),
 });
 
@@ -57,7 +50,6 @@ const validateLoginUp = celebrate({
 });
 
 module.exports = {
-  validateCurrentUser,
   validateUser,
   validateUserId,
   validateAvatar,
