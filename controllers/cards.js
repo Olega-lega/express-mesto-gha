@@ -2,7 +2,10 @@ const Card = require('../models/card');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
-const { created } = require('../utils/constants');
+const {
+  success,
+  created,
+} = require('../utils/constants');
 
 const getCards = async (req, res, next) => {
   try {
@@ -24,7 +27,7 @@ const createCard = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      return next(new BadRequestError(`При создании карточки, переданы некорректные данные. ${errors.join(', ')}`));
+      next(new BadRequestError(`При создании карточки, переданы некорректные данные. ${errors.join(', ')}`));
     }
     return next(err);
   }
@@ -33,18 +36,18 @@ const createCard = async (req, res, next) => {
 const deleteCard = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const query = await Card.findById(id);
+    const query = await Card.findByIdAndRemove(id);
     if (!query) {
-      return next(new NotFoundError('Карточка c указанным id не найдена!'));
+      next(new NotFoundError('Карточка c указанным id не найдена!'));
     }
-    if (query.owner.toHexString() === req.user._id) {
+    if (JSON.stringify(query.owner) !== JSON.stringify(req.user._id)) {
       await Card.findByIdAndRemove(id);
-      return res.json({ message: 'Карточка удалена' });
+      return res.status(success).json({ message: 'Карточка удалена' });
     }
     return next(new ForbiddenError('Недостаточно прав для удаления указанной карточки.'));
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError('Передан некорректный id карточки!'));
+      next(new BadRequestError('Передан некорректный id карточки!'));
     }
     return next(err);
   }
@@ -61,10 +64,10 @@ const likeCard = async (req, res, next) => {
     if (!query) {
       return next(new NotFoundError('Карточка c указанным id не найдена!'));
     }
-    return res.json({ message: 'Лайк добавлен.' });
+    return res.status(created).json(query);
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError('Введены некорректные данные для постановки лайка.'));
+      next(new BadRequestError('Введены некорректные данные для постановки лайка.'));
     }
     return next(err);
   }
@@ -79,12 +82,12 @@ const dislikeCard = async (req, res, next) => {
       { new: true },
     );
     if (!query) {
-      return next(new NotFoundError('Карточка не найдена!'));
+      return next(new NotFoundError('Карточка c указанным id не найдена!'));
     }
-    return res.json({ message: 'Лайк удален!' });
+    return res.status(success).json(query);
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError('Введены некорректные данные для снятия лайка!'));
+      next(new BadRequestError('Введены некорректные данные для снятия лайка!'));
     }
     return next(err);
   }

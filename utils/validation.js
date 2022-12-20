@@ -27,7 +27,7 @@ const validateAvatar = celebrate({
   }),
 });
 
-const validateCreatCard = celebrate({
+const validateNewCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     link: Joi.string().regex(urlRegExp).required(),
@@ -61,7 +61,7 @@ module.exports = {
   validateUser,
   validateUserId,
   validateAvatar,
-  validateCreatCard,
+  validateNewCard,
   validateCardId,
   validateLoginIn,
   validateLoginUp,

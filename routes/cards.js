@@ -4,6 +4,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
+<<<<<<< HEAD
 const { urlRegExp } = require('../utils/constants');
 
 router.get('/', getCards);
@@ -14,6 +15,14 @@ router.post('/', celebrate({
     link: Joi.string().regex(urlRegExp).required(),
   }),
 }), createCard);
+=======
+
+const { validateNewCard, validateCardId } = require('../utils/validation');
+
+router.get('/', getCards);
+
+router.post('/', validateNewCard, createCard);
+>>>>>>> parent of 684cace (main/ fix ошибок)
 
 router.delete('/:id', celebrate({
   params: Joi.object().keys({
