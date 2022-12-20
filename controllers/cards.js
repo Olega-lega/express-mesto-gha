@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 const {
   success,
   created,
@@ -12,7 +13,7 @@ const getCards = async (req, res, next) => {
     return res.json(cards);
   } catch (err) {
     console.error(err);
-    next(err);
+    return next(err);
   }
 };
 
@@ -30,7 +31,7 @@ const createCard = async (req, res, next) => {
       const errors = Object.values(err.errors).map((error) => error.message);
       next(new BadRequestError(`При создании карточки, переданы некорректные данные. ${errors.join(', ')}`));
     }
-    next(err);
+    return next(err);
   }
 };
 
@@ -45,13 +46,13 @@ const deleteCard = async (req, res, next) => {
       await Card.findByIdAndRemove(id);
       return res.status(success).json({ message: 'Карточка удалена' });
     }
-    next(new BadRequestError('Недостаточно прав для удаления указанной карточки.'));
+    return next(new ForbiddenError('Недостаточно прав для удаления указанной карточки.'));
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
       next(new BadRequestError('Передан некорректный id карточки!'));
     }
-    next(err);
+    return next(err);
   }
 };
 
@@ -72,7 +73,7 @@ const likeCard = async (req, res, next) => {
     if (err.name === 'CastError') {
       next(new BadRequestError('Введены некорректные данные для постановки лайка.'));
     }
-    next(err);
+    return next(err);
   }
 };
 
@@ -93,7 +94,7 @@ const dislikeCard = async (req, res, next) => {
     if (err.name === 'CastError') {
       next(new BadRequestError('Введены некорректные данные для снятия лайка!'));
     }
-    next(err);
+    return next(err);
   }
 };
 
