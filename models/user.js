@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const isEmail = require('validator/lib/isEmail');
 const { urlRegExp } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
@@ -8,44 +7,36 @@ const userSchema = new mongoose.Schema({
     required: false,
     minLength: 2,
     maxLength: 30,
-    default: 'Это Тед',
+    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     required: false,
     minLength: 2,
     maxLength: 30,
-    default: 'Плюшевый мишка',
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
     validate: {
       validator(url) {
-        return urlRegExp(url);
+        return urlRegExp.test(url);
       },
       message: (props) => `${props.value} is not a valid url!`,
     },
     required: false,
-    default: 'https://clck.ru/333WpV',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    validate: {
-      validator(string) {
-        return isEmail(string);
-      },
-      message: 'Укажите корректный email',
-    },
   },
   password: {
     type: String,
     required: true,
     select: false,
-    minlength: 2,
   },
-
 });
 
 const user = mongoose.model('user', userSchema);

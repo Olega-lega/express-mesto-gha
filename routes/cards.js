@@ -8,11 +8,11 @@ const {
   deleteCard,
 } = require('../controllers/cards');
 
-const { validateNewCard, validateCardId } = require('../utils/validation');
+const { validateCreatCard, validateCardId } = require('../utils/validation');
 
 router.get('/', getCards);
 
-router.post('/', validateNewCard, createCard);
+router.post('/', validateCreatCard, createCard);
 
 router.put('/:id/likes', validateCardId, likeCard);
 

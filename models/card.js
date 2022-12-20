@@ -12,7 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator(e) {
-        return urlRegExp(e);
+        return urlRegExp.test(e);
       },
       message: (props) => `${props.value} is not a valid url!`,
     },

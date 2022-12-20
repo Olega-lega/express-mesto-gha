@@ -26,19 +26,26 @@ const createUser = async (req, res, next) => {
       name: req.body.name,
       about: req.body.about,
       avatar: req.body.avatar,
+      email: req.body.email,
       password: hash,
     });
-    return res.status(created).json(user);
+    return res.status(created).json({
+      name: user.name,
+      _id: user._id,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    });
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      next(new BadRequestError(`Введены некорректные данные при создании пользователя. ${errors.join(
+      return next(new BadRequestError(`Введены некорректные данные при создании пользователя. ${errors.join(
         ', ',
       )}`));
     }
     if (err.code === 11000) {
-      next(new ConflictError('Пользователь с указанным email уже зарегестрирован!'));
+      return next(new ConflictError('Пользователь с указанным email уже зарегестрирован!'));
     }
     return next(err);
   }
@@ -55,7 +62,7 @@ const getUser = async (req, res, next) => {
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
-      next(new BadRequestError('Введен некорректный id пользователя.'));
+      return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
     return next(err);
   }
@@ -73,18 +80,18 @@ const updateProfile = async (req, res, next) => {
       },
     );
     if (!user) {
-      next(new NotFoundError('Пользователь не найден!'));
+      return next(new NotFoundError('Пользователь не найден!'));
     }
     return res.json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      next(new BadRequestError(`Введен некорректные данные при обновлении профиля. ${errors.join(
+      return next(new BadRequestError(`Введен некорректные данные при обновлении профиля. ${errors.join(
         ', ',
       )}`));
     } if (err.name === 'CastError') {
-      next(new BadRequestError('Введен некорректный id пользователя.'));
+      return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
     return next(err);
   }
@@ -102,40 +109,17 @@ const updateAvatar = async (req, res, next) => {
       },
     );
     if (!user) {
-      next(new NotFoundError('Пользователь не найден!'));
+      return next(new NotFoundError('Пользователь не найден!'));
     }
     return res.json(user);
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
-      next(new BadRequestError(`Введены некорректные данные при обновлении аватара. ${errors.join(', ')}`));
+      return next(new BadRequestError(`Введены некорректные данные при обновлении аватара. ${errors.join(', ')}`));
     } if (err.name === 'CastError') {
-      next(new BadRequestError('Введен некорректный id пользователя.'));
+      return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
-    return next(err);
-  }
-};
-
-const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email }).select('+password');
-
-    if (!user) {
-      return next(new UnauthorizedError('Ошибка в процессе аутентификации пользователя.'));
-    }
-
-    const matched = await bcrypt.compare(password, user.password);
-
-    if (!matched) {
-      throw new UnauthorizedError('Ошибка в процессе аутентификации пользователя.');
-    }
-
-    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-
-    return res.json({ token });
-  } catch (err) {
     return next(err);
   }
 };
@@ -156,12 +140,30 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return next(new UnauthorizedError('Ошибка в процессе аутентификации пользователя.'));
+    }
+    const matched = await bcrypt.compare(password, user.password);
+    if (!matched) {
+      throw new UnauthorizedError('Ошибка в процессе аутентификации пользователя.');
+    }
+    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '5d' });
+    return res.json({ token });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 module.exports = {
   getUsers,
   createUser,
   getUser,
   updateProfile,
   updateAvatar,
-  login,
   getCurrentUser,
+  login,
 };
