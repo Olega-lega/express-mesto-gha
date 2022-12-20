@@ -1,4 +1,3 @@
-const success = 200;
 const created = 201;
 const badRequest = 400;
 const unauthorized = 401;
@@ -10,7 +9,6 @@ const serverError = 500;
 const urlRegExp = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
 
 module.exports = {
-  success,
   created,
   badRequest,
   unauthorized,
