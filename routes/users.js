@@ -2,11 +2,7 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
 const {
-  getUsers,
-  getUser,
-  updateProfile,
-  updateAvatar,
-  getCurrentUser,
+  getUsers, getUser, updateProfile, updateAvatar, getCurrentUser,
 } = require('../controllers/users');
 const { urlRegExp } = require('../utils/constants');
 

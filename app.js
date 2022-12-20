@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const routes = require('./routes');
-const middlewaresErrors = require('./middlewares/middlewaresErrors');
+const serverErrorMiddleware = require('./middlewares/serverErrorMiddleware');
 
 const PORT = 3000;
 const app = express();
@@ -15,7 +15,7 @@ app.use(helmet());
 
 app.use(routes);
 
-app.use(middlewaresErrors);
+app.use(serverErrorMiddleware);
 
 app.use(errors());
 

@@ -1,4 +1,4 @@
-module.exports = (err, req, res, next) => {
+const serverErrorMiddleware = (err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
@@ -9,3 +9,5 @@ module.exports = (err, req, res, next) => {
     });
   next();
 };
+
+module.exports = serverErrorMiddleware;

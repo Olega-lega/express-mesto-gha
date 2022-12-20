@@ -14,7 +14,6 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({});
     return res.json(users);
   } catch (err) {
-    console.error(err);
     return next(err);
   }
 };
@@ -31,13 +30,12 @@ const createUser = async (req, res, next) => {
     });
     return res.status(created).json({
       name: user.name,
-      _id: user._id,
       about: user.about,
       avatar: user.avatar,
       email: user.email,
+      _id: user._id,
     });
   } catch (err) {
-    console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
       return next(new BadRequestError(`Введены некорректные данные при создании пользователя. ${errors.join(
@@ -53,14 +51,13 @@ const createUser = async (req, res, next) => {
 
 const getUser = async (req, res, next) => {
   try {
-    const { id } = req.params._id;
+    const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
       return next(new NotFoundError('Пользователь не найден'));
     }
     return res.json(user);
   } catch (err) {
-    console.error(err);
     if (err.name === 'CastError') {
       return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
@@ -84,14 +81,11 @@ const updateProfile = async (req, res, next) => {
     }
     return res.json(user);
   } catch (err) {
-    console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
       return next(new BadRequestError(`Введен некорректные данные при обновлении профиля. ${errors.join(
         ', ',
       )}`));
-    } if (err.name === 'CastError') {
-      return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
     return next(err);
   }
@@ -113,12 +107,9 @@ const updateAvatar = async (req, res, next) => {
     }
     return res.json(user);
   } catch (err) {
-    console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
       return next(new BadRequestError(`Введены некорректные данные при обновлении аватара. ${errors.join(', ')}`));
-    } if (err.name === 'CastError') {
-      return next(new BadRequestError('Введен некорректный id пользователя.'));
     }
     return next(err);
   }

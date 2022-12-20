@@ -9,7 +9,6 @@ const getCards = async (req, res, next) => {
     const cards = await Card.find({}).populate(['owner', 'likes']);
     return res.json(cards);
   } catch (err) {
-    console.error(err);
     return next(err);
   }
 };
@@ -23,7 +22,6 @@ const createCard = async (req, res, next) => {
     });
     return res.status(created).json(newCard);
   } catch (err) {
-    console.error(err);
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map((error) => error.message);
       return next(new BadRequestError(`При создании карточки, переданы некорректные данные. ${errors.join(', ')}`));
@@ -45,7 +43,6 @@ const deleteCard = async (req, res, next) => {
     }
     return next(new ForbiddenError('Недостаточно прав для удаления указанной карточки.'));
   } catch (err) {
-    console.error(err);
     if (err.name === 'CastError') {
       return next(new BadRequestError('Передан некорректный id карточки!'));
     }
@@ -66,7 +63,6 @@ const likeCard = async (req, res, next) => {
     }
     return res.json({ message: 'Лайк добавлен.' });
   } catch (err) {
-    console.error(err);
     if (err.name === 'CastError') {
       return next(new BadRequestError('Введены некорректные данные для постановки лайка.'));
     }
@@ -87,7 +83,6 @@ const dislikeCard = async (req, res, next) => {
     }
     return res.json({ message: 'Лайк удален!' });
   } catch (err) {
-    console.error(err);
     if (err.name === 'CastError') {
       return next(new BadRequestError('Введены некорректные данные для снятия лайка!'));
     }

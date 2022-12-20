@@ -5,8 +5,8 @@ const usersRouter = require('./users');
 const cardsRouter = require('./cards');
 const auth = require('../middlewares/auth');
 const { login, createUser } = require('../controllers/users');
-const NotFoundError = require('../errors/NotFoundError');
 const { urlRegExp } = require('../utils/constants');
+const NotFoundError = require('../errors/NotFoundError');
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -27,10 +27,10 @@ router.post('/signup', celebrate({
 
 router.use(auth);
 
-router.use('/cards', cardsRouter);
-
 router.use('/users', usersRouter);
 
-router.use('*', (req, res, next) => next(new NotFoundError('Роут не найден')));
+router.use('/cards', cardsRouter);
+
+router.use('*', (req, res, next) => next(new NotFoundError('Запрашиваемый роут не существует')));
 
 module.exports = router;
